@@ -231,7 +231,6 @@ struct mt76_wcid {
 
 	u16 tx_rate;
 	bool tx_rate_set;
-	u8 tx_rate_nss;
 };
 
 struct mt76_vif {

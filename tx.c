@@ -139,7 +139,7 @@ void mt7601u_tx(struct ieee80211_hw *hw, struct ieee80211_tx_control *control,
 	int hw_q = skb2q(skb);
 	u32 dma_flags, pkt_id;
 	u16 rate_ctl;
-	u8 ep = q2ep(hw_q), nss;
+	u8 ep = q2ep(hw_q);
 	unsigned long flags;
 	bool is_probe;
 
@@ -173,7 +173,7 @@ void mt7601u_tx(struct ieee80211_hw *hw, struct ieee80211_tx_control *control,
 	if (rate->idx < 0 || !rate->count)
 		rate_ctl = wcid->tx_rate;
 	else
-		rate_ctl = mt76_mac_tx_rate_val(dev, rate, &nss);
+		rate_ctl = mt76_mac_tx_rate_val(dev, rate);
 	spin_unlock_irqrestore(&dev->lock, flags);
 	txwi->rate_ctl = cpu_to_le16(rate_ctl);
 

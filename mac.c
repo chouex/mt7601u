@@ -112,16 +112,15 @@ mt76_mac_fill_tx_status(struct mt7601u_dev *dev, struct ieee80211_tx_info *info,
 }
 
 u16 mt76_mac_tx_rate_val(struct mt7601u_dev *dev,
-			 const struct ieee80211_tx_rate *rate, u8 *nss_val)
+			 const struct ieee80211_tx_rate *rate)
 {
 	u16 rateval;
 	u8 phy, rate_idx;
-	u8 nss = 1;
 	u8 bw = 0;
 
 	if (rate->flags & IEEE80211_TX_RC_MCS) {
 		rate_idx = rate->idx;
-		nss = 1 + (rate->idx >> 3);
+		WARN_ON(rate->idx >> 3);
 		phy = MT_PHY_TYPE_HT;
 		if (rate->flags & IEEE80211_TX_RC_GREEN_FIELD)
 			phy = MT_PHY_TYPE_HT_GF;
@@ -149,7 +148,6 @@ u16 mt76_mac_tx_rate_val(struct mt7601u_dev *dev,
 	if (rate->flags & IEEE80211_TX_RC_SHORT_GI)
 		rateval |= MT_XWI_RATE_SGI;
 
-	*nss_val = nss;
 	return rateval;
 }
 
@@ -159,7 +157,7 @@ void mt76_mac_wcid_set_rate(struct mt7601u_dev *dev, struct mt76_wcid *wcid,
 	unsigned long flags;
 
 	spin_lock_irqsave(&dev->lock, flags);
-	wcid->tx_rate = mt76_mac_tx_rate_val(dev, rate, &wcid->tx_rate_nss);
+	wcid->tx_rate = mt76_mac_tx_rate_val(dev, rate);
 	wcid->tx_rate_set = true;
 	spin_unlock_irqrestore(&dev->lock, flags);
 }

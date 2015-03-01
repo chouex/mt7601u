@@ -167,7 +167,7 @@ int mt76_mac_shared_key_setup(struct mt7601u_dev *dev, u8 vif_idx, u8 key_idx,
 			      struct ieee80211_key_conf *key);
 
 u16 mt76_mac_tx_rate_val(struct mt7601u_dev *dev,
-			 const struct ieee80211_tx_rate *rate, u8 *nss_val);
+			 const struct ieee80211_tx_rate *rate);
 struct mt76_tx_status
 mt7601u_mac_fetch_tx_status(struct mt7601u_dev *dev);
 void
