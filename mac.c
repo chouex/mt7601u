@@ -30,9 +30,8 @@ mt76_mac_process_tx_rate(struct ieee80211_tx_rate *txrate, u16 rate,
 
 	switch (MT76_GET(MT_XWI_RATE_PHY, rate)) {
 	case MT_PHY_TYPE_OFDM:
-		if (band == IEEE80211_BAND_2GHZ)
-			idx += 4;
-
+		WARN_ON(band != IEEE80211_BAND_2GHZ); /* TODO: drop this */
+		idx += 4;
 		txrate->idx = idx;
 		return;
 	case MT_PHY_TYPE_CCK:
