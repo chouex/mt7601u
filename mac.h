@@ -116,7 +116,7 @@ enum mt76_phy_bandwith {
 	MT_PHY_BW_80,
 };
 
-struct mt76_txwi {
+struct mt7601u_txwi {
 	__le16 flags;
 	__le16 rate_ctl;
 

@@ -46,7 +46,7 @@ static void mt7601u_tx_skb_remove_dma_overhead(struct sk_buff *skb,
 {
 	int pkt_len = (unsigned long)info->status.status_driver_data[0];
 
-	skb_pull(skb, sizeof(struct mt76_txwi) + 4);
+	skb_pull(skb, sizeof(struct mt7601u_txwi) + 4);
 	if (ieee80211_get_hdrlen_from_skb(skb) % 4)
 		mt76_remove_hdr_pad(skb);
 
@@ -71,7 +71,7 @@ static int mt7601u_skb_rooms(struct mt7601u_dev *dev, struct sk_buff *skb)
 	u32 need_head, need_tail;
 	int ret;
 
-	need_head = sizeof(struct mt76_txwi) + 4;
+	need_head = sizeof(struct mt7601u_txwi) + 4;
 	need_tail = 3 + 4 + 4; /* TODO: replace 3 with round-up. */
 
 	if (hdr_len % 4)
@@ -134,7 +134,7 @@ void mt7601u_tx(struct ieee80211_hw *hw, struct ieee80211_tx_control *control,
 	struct ieee80211_sta *sta = control->sta;
 	struct mt76_sta *msta = NULL;
 	struct mt76_wcid *wcid = dev->mon_wcid;
-	struct mt76_txwi *txwi;
+	struct mt7601u_txwi *txwi;
 	int pkt_len = skb->len;
 	int hw_q = skb2q(skb);
 	u32 dma_flags, pkt_id;
@@ -166,7 +166,7 @@ void mt7601u_tx(struct ieee80211_hw *hw, struct ieee80211_tx_control *control,
 	rate = &info->control.rates[0];
 
 	/* TODO: this is unaligned */
-	txwi = (struct mt76_txwi *)skb_push(skb, sizeof(struct mt76_txwi));
+	txwi = (struct mt7601u_txwi *)skb_push(skb, sizeof(struct mt7601u_txwi));
 	memset(txwi, 0, sizeof(*txwi));
 
 	spin_lock_irqsave(&dev->lock, flags);

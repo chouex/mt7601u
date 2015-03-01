@@ -303,12 +303,13 @@ TRACE_EVENT(mt_tx_status,
 );
 
 TRACE_EVENT(mt_tx,
-	TP_PROTO(struct sk_buff *skb, struct mt76_sta *sta, struct mt76_txwi *h),
+	TP_PROTO(struct sk_buff *skb, struct mt76_sta *sta,
+		 struct mt7601u_txwi *h),
 
 	TP_ARGS(skb, sta, h),
 
 	TP_STRUCT__entry(
-		__field_struct(struct mt76_txwi, h)
+		__field_struct(struct mt7601u_txwi, h)
 		__field(struct sk_buff *, skb)
 		__field(struct mt76_sta *, sta)
 	),
