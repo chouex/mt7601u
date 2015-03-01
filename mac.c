@@ -12,9 +12,11 @@
  * GNU General Public License for more details.
  */
 
-#include "mt7601u.h"
-#include "trace.h"
 #include <linux/etherdevice.h>
+
+#include "mt7601u.h"
+#include "mac.h"
+#include "trace.h"
 
 static void
 mt76_mac_process_tx_rate(struct ieee80211_tx_rate *txrate, u16 rate,
