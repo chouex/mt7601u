@@ -131,23 +131,6 @@ TRACE_EVENT(mt_vend_req,
 		  !!__entry->buf, __entry->buflen)
 );
 
-TRACE_EVENT(ee_read,
-	TP_PROTO(int offset, u16 val),
-
-	TP_ARGS(offset, val),
-
-	TP_STRUCT__entry(
-		__field(int, o) __field(u16, v)
-	),
-
-	TP_fast_assign(
-		__entry->o = offset;
-		__entry->v = val;
-	),
-
-	TP_printk("%04x=%04x", __entry->o, __entry->v)
-);
-
 TRACE_EVENT(read_temp,
 	TP_PROTO(u8 temp),
 
