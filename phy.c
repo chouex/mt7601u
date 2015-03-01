@@ -191,7 +191,7 @@ int mt7601u_phy_get_rssi(struct mt7601u_dev *dev,
 			/* bw40 */ { -2, 16, 34 }
 		}
 	};
-	int bw = MT76_GET(MT_RXWI_RATE_BW, rate);
+	int bw = MT76_GET(MT_XWI_RATE_BW, rate);
 	int aux_lna = MT76_GET(MT_RXWI_ANT_AUX_LNA, rxwi->ant);
 	int lna_id = MT76_GET(MT_RXWI_GAIN_RSSI_LNA_ID, rxwi->gain);
 	int val;

@@ -87,15 +87,15 @@ struct mt7601u_rxwi {
 #define MT_RXWI_FRAG			GENMASK(3, 0)
 #define MT_RXWI_SN			GENMASK(15, 4)
 
-/* TODO: *XWI_RATE_* defs are the same for RX/TX/stat */
-#define MT_RXWI_RATE_MCS		GENMASK(6, 0)
-#define MT_RXWI_RATE_BW			BIT(7)
-#define MT_RXWI_RATE_SGI		BIT(8)
-#define MT_RXWI_RATE_STBC		GENMASK(10, 9)
-#define MT_RXWI_RATE_ETXBF		BIT(11)
-#define MT_RXWI_RATE_SND		BIT(12)
-#define MT_RXWI_RATE_ITXBF		BIT(13)
-#define MT_RXWI_RATE_PHY		GENMASK(15, 14)
+/* Note: these fields are common for RXWI/TXWI/status */
+#define MT_XWI_RATE_MCS			GENMASK(6, 0)
+#define MT_XWI_RATE_BW			BIT(7)
+#define MT_XWI_RATE_SGI			BIT(8)
+#define MT_XWI_RATE_STBC		GENMASK(10, 9)
+#define MT_XWI_RATE_ETXBF		BIT(11)
+#define MT_XWI_RATE_SND			BIT(12)
+#define MT_XWI_RATE_ITXBF		BIT(13)
+#define MT_XWI_RATE_PHY			GENMASK(15, 14)
 
 #define MT_RXWI_GAIN_RSSI_VAL		GENMASK(5, 0)
 #define MT_RXWI_GAIN_RSSI_LNA_ID	GENMASK(7, 6)
@@ -144,12 +144,6 @@ struct mt7601u_txwi {
 #define MT_TXWI_FLAGS_NO_RATE_FALLBACK	BIT(13)
 #define MT_TXWI_FLAGS_TX_RPT		BIT(14)
 #define MT_TXWI_FLAGS_TX_RATE_LUT	BIT(15)
-
-#define MT_TXWI_RATE_MCS		GENMASK(6, 0)
-#define MT_TXWI_RATE_BW			BIT(7)
-#define MT_TXWI_RATE_SGI		BIT(8)
-#define MT_TXWI_RATE_STBC		GENMASK(10, 9)
-#define MT_TXWI_RATE_PHY_MODE		GENMASK(15, 14)
 
 #define MT_TXWI_ACK_CTL_REQ		BIT(0)
 #define MT_TXWI_ACK_CTL_NSEQ		BIT(1)

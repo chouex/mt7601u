@@ -20,13 +20,13 @@ static void
 mt76_mac_process_tx_rate(struct ieee80211_tx_rate *txrate, u16 rate,
 			 enum ieee80211_band band)
 {
-	u8 idx = MT76_GET(MT_TXWI_RATE_MCS, rate);
+	u8 idx = MT76_GET(MT_XWI_RATE_MCS, rate);
 
 	txrate->idx = 0;
 	txrate->flags = 0;
 	txrate->count = 1;
 
-	switch (MT76_GET(MT_TXWI_RATE_PHY_MODE, rate)) {
+	switch (MT76_GET(MT_XWI_RATE_PHY, rate)) {
 	case MT_PHY_TYPE_OFDM:
 		if (band == IEEE80211_BAND_2GHZ)
 			idx += 4;
@@ -51,7 +51,7 @@ mt76_mac_process_tx_rate(struct ieee80211_tx_rate *txrate, u16 rate,
 		return;
 	}
 
-	switch (MT76_GET(MT_TXWI_RATE_BW, rate)) {
+	switch (MT76_GET(MT_XWI_RATE_BW, rate)) {
 	case MT_PHY_BW_20:
 		break;
 	case MT_PHY_BW_40:
@@ -65,7 +65,7 @@ mt76_mac_process_tx_rate(struct ieee80211_tx_rate *txrate, u16 rate,
 		break;
 	}
 
-	if (rate & MT_TXWI_RATE_SGI)
+	if (rate & MT_XWI_RATE_SGI)
 		txrate->flags |= IEEE80211_TX_RC_SHORT_GI;
 }
 
@@ -145,11 +145,11 @@ u16 mt76_mac_tx_rate_val(struct mt7601u_dev *dev,
 		bw = 0;
 	}
 
-	rateval = MT76_SET(MT_RXWI_RATE_MCS, rate_idx);
-	rateval |= MT76_SET(MT_RXWI_RATE_PHY, phy);
-	rateval |= MT76_SET(MT_RXWI_RATE_BW, bw);
+	rateval = MT76_SET(MT_XWI_RATE_MCS, rate_idx);
+	rateval |= MT76_SET(MT_XWI_RATE_PHY, phy);
+	rateval |= MT76_SET(MT_XWI_RATE_BW, bw);
 	if (rate->flags & IEEE80211_TX_RC_SHORT_GI)
-		rateval |= MT_RXWI_RATE_SGI;
+		rateval |= MT_XWI_RATE_SGI;
 
 	*nss_val = nss;
 	return rateval;
@@ -381,10 +381,10 @@ void mt7601u_mac_set_ampdu_factor(struct mt7601u_dev *dev,
 static void
 mt76_mac_process_rate(struct ieee80211_rx_status *status, u16 rate)
 {
-	u8 idx = MT76_GET(MT_RXWI_RATE_MCS, rate);
+	u8 idx = MT76_GET(MT_XWI_RATE_MCS, rate);
 
 	/* TODO: not sure about math in this switch */
-	switch (MT76_GET(MT_RXWI_RATE_PHY, rate)) {
+	switch (MT76_GET(MT_XWI_RATE_PHY, rate)) {
 	case MT_PHY_TYPE_OFDM:
 		if (WARN_ON(idx >= 8))
 			idx = 0;
@@ -415,13 +415,13 @@ mt76_mac_process_rate(struct ieee80211_rx_status *status, u16 rate)
 		return;
 	}
 
-	if (rate & MT_RXWI_RATE_SGI)
+	if (rate & MT_XWI_RATE_SGI)
 		status->flag |= RX_FLAG_SHORT_GI;
 
-	if (rate & MT_RXWI_RATE_STBC)
+	if (rate & MT_XWI_RATE_STBC)
 		status->flag |= 1 << RX_FLAG_STBC_SHIFT;
 
-	if (rate & MT_RXWI_RATE_BW)
+	if (rate & MT_XWI_RATE_BW)
 		status->flag |= RX_FLAG_40MHZ;
 }
 
@@ -431,7 +431,7 @@ mt7601u_rx_monitor_beacon(struct mt7601u_dev *dev, struct mt7601u_rxwi *rxwi,
 {
 	spin_lock_bh(&dev->last_beacon.lock);
 	dev->last_beacon.freq_off = rxwi->freq_off;
-	dev->last_beacon.phy_mode = MT76_GET(MT_RXWI_RATE_PHY, rate);
+	dev->last_beacon.phy_mode = MT76_GET(MT_XWI_RATE_PHY, rate);
 	spin_unlock_bh(&dev->last_beacon.lock);
 }
 
