@@ -16,7 +16,6 @@
 
 #include "mt7601u.h"
 #include "mac.h"
-#include "trace.h"
 
 static void
 mt76_mac_process_tx_rate(struct ieee80211_tx_rate *txrate, u16 rate,
@@ -120,7 +119,7 @@ u16 mt76_mac_tx_rate_val(struct mt7601u_dev *dev,
 
 	if (rate->flags & IEEE80211_TX_RC_MCS) {
 		rate_idx = rate->idx;
-		WARN_ON(rate->idx >> 3);
+		WARN_ON(rate->idx >> 3); /* TODO: remove this */
 		phy = MT_PHY_TYPE_HT;
 		if (rate->flags & IEEE80211_TX_RC_GREEN_FIELD)
 			phy = MT_PHY_TYPE_HT_GF;
@@ -222,15 +221,12 @@ void mt7601u_mac_set_protection(struct mt7601u_dev *dev, bool legacy_prot,
 	switch (mode) {
 	case IEEE80211_HT_OP_MODE_PROTECTION_NONE:
 		break;
-
 	case IEEE80211_HT_OP_MODE_PROTECTION_NONMEMBER:
 		ht_rts[0] = ht_rts[1] = ht_rts[2] = ht_rts[3] = true;
 		break;
-
 	case IEEE80211_HT_OP_MODE_PROTECTION_20MHZ:
 		ht_rts[1] = ht_rts[3] = true;
 		break;
-
 	case IEEE80211_HT_OP_MODE_PROTECTION_NONHT_MIXED:
 		ht_rts[0] = ht_rts[1] = ht_rts[2] = ht_rts[3] = true;
 		break;
@@ -278,6 +274,8 @@ void mt7601u_mac_config_tsf(struct mt7601u_dev *dev, bool enable, int interval)
 		MT_BEACON_TIME_CFG_TIMER_EN |
 		MT_BEACON_TIME_CFG_SYNC_MODE |
 		MT_BEACON_TIME_CFG_TBTT_EN;
+
+	/* TODO: why is there no write here?? */
 }
 
 static void mt7601u_check_mac_err(struct mt7601u_dev *dev)
@@ -287,7 +285,7 @@ static void mt7601u_check_mac_err(struct mt7601u_dev *dev)
 	if (!(val & BIT(29)) || !(val & (BIT(7) | BIT(5))))
 		return;
 
-	printk("Warning: MAC specific condition occured\n");
+	dev_warn(dev->dev, "Warning: MAC specific condition occured\n");
 
 	mt76_set(dev, MT_MAC_SYS_CTRL, MT_MAC_SYS_CTRL_RESET_CSR);
 	udelay(10);
@@ -379,7 +377,6 @@ mt76_mac_process_rate(struct ieee80211_rx_status *status, u16 rate)
 {
 	u8 idx = MT76_GET(MT_XWI_RATE_MCS, rate);
 
-	/* TODO: not sure about math in this switch */
 	switch (MT76_GET(MT_XWI_RATE_PHY, rate)) {
 	case MT_PHY_TYPE_OFDM:
 		if (WARN_ON(idx >= 8))
@@ -453,7 +450,7 @@ int mt76_mac_process_rx(struct mt7601u_dev *dev, struct sk_buff *skb, void *rxi)
 	}
 
 	len = MT76_GET(MT_RXWI_CTL_MPDU_LEN, ctl);
-	skb_trim(skb, len);
+	skb_trim(skb, len); /* TODO: len should be equal to skb->len already */
 
 	status->chains = BIT(0);
 	rssi = mt7601u_phy_get_rssi(dev, rxwi, rate);
@@ -512,16 +509,14 @@ int mt76_mac_wcid_set_key(struct mt7601u_dev *dev, u8 idx,
 	if (cipher == MT_CIPHER_NONE && key)
 		return -EINVAL;
 
-	printk("setting key for idx:%02hhx\n", idx);
-
 	mt7601u_wr_copy(dev, MT_WCID_KEY(idx), key_data, sizeof(key_data));
 
 	memset(iv_data, 0, sizeof(iv_data));
 	if (key) {
 		iv_data[3] = key->keyidx << 6;
 		if (cipher >= MT_CIPHER_TKIP) {
-			/* CHANGED: start with 1 to comply with spec,
-			 *	    (see comment on common/cmm_wpa.c:4291).
+			/* Note: start with 1 to comply with spec,
+			 *	 (see comment on common/cmm_wpa.c:4291).
 			 */
 			iv_data[0] |= 1;
 			iv_data[3] |= 0x20;
@@ -529,15 +524,14 @@ int mt76_mac_wcid_set_key(struct mt7601u_dev *dev, u8 idx,
 	}
 	mt7601u_wr_copy(dev, MT_WCID_IV(idx), iv_data, sizeof(iv_data));
 
-	/* CHANGED: move attr updates after all key info is set */
-	/* CHANGED: don't use rmw for value changes to save urbs */
 	val = mt7601u_rr(dev, MT_WCID_ATTR(idx));
 	val &= ~MT_WCID_ATTR_PKEY_MODE & ~MT_WCID_ATTR_PKEY_MODE_EXT;
 	val |= MT76_SET(MT_WCID_ATTR_PKEY_MODE, cipher & 7) |
 	       MT76_SET(MT_WCID_ATTR_PKEY_MODE_EXT, cipher >> 3);
 	val &= ~MT_WCID_ATTR_PAIRWISE;
-	val |= MT_WCID_ATTR_PAIRWISE *
-		!!(key && key->flags & IEEE80211_KEY_FLAG_PAIRWISE);
+	if (key && key->flags & IEEE80211_KEY_FLAG_PAIRWISE)
+		val |= MT_WCID_ATTR_PAIRWISE;
+
 	mt7601u_wr(dev, MT_WCID_ATTR(idx), val);
 
 	return 0;
@@ -553,9 +547,6 @@ int mt76_mac_shared_key_setup(struct mt7601u_dev *dev, u8 vif_idx, u8 key_idx,
 	cipher = mt76_mac_get_key_info(key, key_data);
 	if (cipher == MT_CIPHER_NONE && key)
 		return -EINVAL;
-
-	printk("setting key for vif_idx:%02hhx key_idx:%02hhx\n",
-	       vif_idx, key_idx);
 
 	mt7601u_wr_copy(dev, MT_SKEY(vif_idx, key_idx),
 			key_data, sizeof(key_data));
