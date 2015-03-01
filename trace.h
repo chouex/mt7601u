@@ -131,22 +131,6 @@ TRACE_EVENT(mt_vend_req,
 		  !!__entry->buf, __entry->buflen)
 );
 
-TRACE_EVENT(read_temp,
-	TP_PROTO(u8 temp),
-
-	TP_ARGS(temp),
-
-	TP_STRUCT__entry(
-		__field(u8, temp)
-	),
-
-	TP_fast_assign(
-		__entry->temp = temp;
-	),
-
-	TP_printk("%02hhx", __entry->temp)
-);
-
 TRACE_EVENT(freq_cal_offset,
 	TP_PROTO(u8 phy_mode, s8 freq_off),
 
