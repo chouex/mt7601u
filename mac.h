@@ -113,7 +113,6 @@ enum mt76_phy_type {
 enum mt76_phy_bandwith {
 	MT_PHY_BW_20,
 	MT_PHY_BW_40,
-	MT_PHY_BW_80,
 };
 
 struct mt7601u_txwi {

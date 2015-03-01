@@ -57,9 +57,6 @@ mt76_mac_process_tx_rate(struct ieee80211_tx_rate *txrate, u16 rate,
 	case MT_PHY_BW_40:
 		txrate->flags |= IEEE80211_TX_RC_40_MHZ_WIDTH;
 		break;
-	case MT_PHY_BW_80:
-		txrate->flags |= IEEE80211_TX_RC_80_MHZ_WIDTH;
-		break;
 	default:
 		WARN_ON(1);
 		break;
